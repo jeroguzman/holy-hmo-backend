@@ -42,6 +42,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
+    photo = models.ImageField(upload_to='media/', blank=True, null=True)
     role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
     church = models.ForeignKey(Church, on_delete=models.CASCADE, blank=True, null=True)
     is_active = models.BooleanField(default=True)
