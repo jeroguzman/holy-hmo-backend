@@ -35,8 +35,8 @@ class CreateUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 class UserView(APIView):
-    def get(self, request, email):
-        user = User.objects.get(email=email)
+    def get(self, request, format=None):
+        user = User.objects.get(email=request.GET.get('email'))
         user_details = {
             'username': user.username,
             'email': user.email,
