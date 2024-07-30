@@ -20,6 +20,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["church"] = self.user.church.name if self.user.church else None
         data["birthdate"] = self.user.birthdate if self.user.birthdate else None
         data["phone"] = self.user.phone if self.user.phone else None
+        data["photo"] = self.user.photo.url if self.user.photo else None
 
         return data
 
@@ -32,6 +33,22 @@ class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+class UserView(APIView):
+    def get(self, request, email):
+        user = User.objects.get(email=email)
+        user_details = {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'phone': user.phone,
+            'birthdate': user.birthdate,
+            'photo': request.build_absolute_uri(user.photo.url) if user.photo else None,
+            'role': user.role.id if user.role else None,
+            'church': user.church.id if user.church else None,
+        }
+        return Response(user_details, status=status.HTTP_200_OK)
 
 class UserEditView(APIView):
     def put(self, request):
@@ -62,18 +79,24 @@ class UserEditView(APIView):
         return Response(status=status.HTTP_200_OK)
     
 
-def update_profile(request, id):
-    user = User.objects.get(id=id)
-    data = request.data
-
-    user.name = data.get('name')
-    user.email = data.get('email')
-    user.photo = request.FILES.get('photo') if request.FILES.get('photo') else None
-    user.phone_no = data.get('phone_no')
-    user.allow_wa = True if data.get('allow_wa') == 'true' else False
-    user.allow_calls = True if data.get('allow_calls') == 'true' else False
-
-    user.save()
-
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+class RoleView(APIView):
+    def get(self, request):
+        roles = Role.objects.all()
+        roles_list = []
+        for role in roles:
+            roles_list.append({
+                'id': role.id,
+                'name': role.name,
+            })
+        return Response(roles_list, status=status.HTTP_200_OK)
+    
+class ChurchView(APIView):
+    def get(self, request):
+        churches = Church.objects.all()
+        churches_list = []
+        for church in churches:
+            churches_list.append({
+                'id': church.id,
+                'name': church.name,
+            })
+        return Response(churches_list, status=status.HTTP_200_OK)
