@@ -34,7 +34,10 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+
 class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         user = User.objects.get(email=request.GET.get('email'))
         user_details = {
@@ -51,6 +54,8 @@ class UserView(APIView):
         return Response(user_details, status=status.HTTP_200_OK)
 
 class UserEditView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request):
         data = request.data
         user = User.objects.get(email=data.get('email'))
@@ -80,6 +85,9 @@ class UserEditView(APIView):
     
 
 class RoleView(APIView):
+
+    permission_classes = [AllowAny]
+
     def get(self, request):
         roles = Role.objects.all()
         roles_list = []
@@ -91,6 +99,9 @@ class RoleView(APIView):
         return Response(roles_list, status=status.HTTP_200_OK)
     
 class ChurchView(APIView):
+
+    permission_classes = [AllowAny]
+
     def get(self, request):
         churches = Church.objects.all()
         churches_list = []
