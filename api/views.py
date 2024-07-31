@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User, Role, Church
+from .models import User, Role, Church, Event, Article, ArticleImage, EventImage, ArticleComment, EventComment, EventAttendee
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -111,3 +111,50 @@ class ChurchView(APIView):
                 'name': church.name,
             })
         return Response(churches_list, status=status.HTTP_200_OK)
+    
+class EventView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        events = Event.objects.all()
+        events_list = []
+        for event in events:
+            events_list.append({
+                'id': event.id,
+                'name': event.name,
+                'description': event.description,
+                'datetime': event.datetime,
+                'location': event.location,
+                'images': [EventImage.objects.filter(event=event)[0].image.url],
+                'attendance': EventAttendee.objects.filter(event=event).count(),
+            })
+        return Response(events_list, status=status.HTTP_200_OK)
+    
+class EventDetailView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        event = Event.objects.get(id=request.GET.get('id'))
+        event_details = {
+            'id': event.id,
+            'name': event.name,
+            'description': event.description,
+            'datetime': event.datetime,
+            'location': event.location,
+            'images': [request.build_absolute_uri(image.image.url) for image in EventImage.objects.filter(event=event)],
+            'attendance': EventAttendee.objects.filter(event=event).count(),
+        }
+        return Response(event_details, status=status.HTTP_200_OK)
+
+class EventAttendView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        event = Event.objects.get(id=data.get('event'))
+        user = User.objects.get(email=data.get('email'))
+        EventAttendee.objects.create(event=event, user=user)
+        return Response(status=status.HTTP_200_OK)

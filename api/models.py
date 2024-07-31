@@ -62,3 +62,60 @@ class User(AbstractUser):
     
     def has_module_perms(self, app_label):
         return True
+    
+class Event(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    datetime = models.DateTimeField()
+    location = models.CharField(max_length=100)
+        
+    def __str__(self):
+        return self.name
+        
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    datetime = models.DateTimeField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+        
+    def __str__(self):
+        return self.title
+        
+class ArticleImage(models.Model):
+    image = models.ImageField(upload_to='media/')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+        
+    def __str__(self):
+        return self.image.url
+    
+class EventImage(models.Model):
+    image = models.ImageField(upload_to='media/')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+        
+    def __str__(self):
+        return self.image.url
+    
+class ArticleComment(models.Model):
+    content = models.TextField()
+    datetime = models.DateTimeField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+        
+    def __str__(self):
+        return self.content
+
+class EventComment(models.Model):
+    content = models.TextField()
+    datetime = models.DateTimeField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+        
+    def __str__(self):
+        return self.content
+    
+class EventAttendee(models.Model):
+    attendee = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.attendee.username
