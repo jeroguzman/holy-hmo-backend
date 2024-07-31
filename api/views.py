@@ -126,7 +126,7 @@ class EventView(APIView):
                 'description': event.description,
                 'datetime': event.datetime,
                 'location': event.location,
-                'images': [EventImage.objects.filter(event=event)[0].image.url],
+                'image': request.build_absolute_uri(EventImage.objects.filter(event=event).first().image.url) if EventImage.objects.filter(event=event).first() else None,
                 'attendance': EventAttendee.objects.filter(event=event).count(),
             })
         return Response(events_list, status=status.HTTP_200_OK)
