@@ -40,6 +40,17 @@ class UserView(APIView):
 
     def get(self, request, format=None):
         user = User.objects.get(email=request.GET.get('email'))
+        events = Event.objects.filter(attendees=user)
+        list = []
+        for event in events:
+            list.append({
+                'id': event.id,
+                'name': event.name,
+                'datetime': event.datetime,
+                'location': event.location,
+                'image': request.build_absolute_uri(EventImage.objects.filter(event=event).first().image.url) if EventImage.objects.filter(event=event).first() else None,
+            })
+
         user_details = {
             'username': user.username,
             'email': user.email,
@@ -50,6 +61,7 @@ class UserView(APIView):
             'photo': request.build_absolute_uri(user.photo.url) if user.photo else None,
             'role': user.role.id if user.role else None,
             'church': user.church.id if user.church else None,
+            'events': list,
         }
         return Response(user_details, status=status.HTTP_200_OK)
 
