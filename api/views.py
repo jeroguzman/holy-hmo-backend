@@ -145,6 +145,12 @@ class EventDetailView(APIView):
             'location': event.location,
             'images': [request.build_absolute_uri(image.image.url) for image in EventImage.objects.filter(event=event)],
             'attendance': EventAttendee.objects.filter(event=event).count(),
+            'comments': [{
+                'content': comment.content,
+                'datetime': comment.datetime,
+                'author': comment.author.first_name + " " + comment.author.last_name,
+                'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
+            } for comment in EventComment.objects.filter(event=event)],
         }
         return Response(event_details, status=status.HTTP_200_OK)
 
@@ -170,17 +176,3 @@ class EventCommentView(APIView):
         user = User.objects.get(email=data.get('email'))
         EventComment.objects.create(event=event, user=user, content=data.get('content'))
         return Response(status=status.HTTP_200_OK)
-    
-    def get(self, request):
-        event = Event.objects.get(id=request.GET.get('event'))
-        comments = EventComment.objects.filter(event=event)
-        comments_list = []
-        for comment in comments:
-            comments_list.append({
-                'id': comment.id,
-                'content': comment.content,
-                'datetime': comment.datetime,
-                'author': comment.author.username,
-                'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
-            })
-        return Response(comments_list, status=status.HTTP_200_OK)
