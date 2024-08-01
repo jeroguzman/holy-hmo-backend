@@ -137,6 +137,8 @@ class EventDetailView(APIView):
 
     def get(self, request):
         event = Event.objects.get(id=request.GET.get('id'))
+        email = request.GET.get('email')
+
         event_details = {
             'id': event.id,
             'name': event.name,
@@ -151,6 +153,8 @@ class EventDetailView(APIView):
                 'author': comment.author.first_name + " " + comment.author.last_name,
                 'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
             } for comment in EventComment.objects.filter(event=event)],
+            'attending': EventAttendee.objects.filter(event=event, user=User.objects.get(email=email)).exists
+
         }
         return Response(event_details, status=status.HTTP_200_OK)
 
@@ -175,4 +179,15 @@ class EventCommentView(APIView):
         event = Event.objects.get(id=data.get('event'))
         author = User.objects.filter(email=data.get('email')).first()
         EventComment.objects.create(event=event, author=author, content=data.get('content'))
+        return Response(status=status.HTTP_200_OK)
+
+class AttendEventView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        event = Event.objects.get(id=data.get('event'))
+        user = User.objects.get(email=data.get('email'))
+        EventAttendee.objects.create(event=event, user=user)
         return Response(status=status.HTTP_200_OK)
