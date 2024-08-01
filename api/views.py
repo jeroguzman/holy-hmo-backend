@@ -173,6 +173,6 @@ class EventCommentView(APIView):
     def post(self, request):
         data = request.data
         event = Event.objects.get(id=data.get('event'))
-        user = User.objects.get(email=data.get('email'))
+        user = User.objects.filter(email=data.get('email')).first()
         EventComment.objects.create(event=event, user=user, content=data.get('content'))
         return Response(status=status.HTTP_200_OK)

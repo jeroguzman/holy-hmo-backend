@@ -66,7 +66,7 @@ class User(AbstractUser):
 class Event(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=100)
         
     def __str__(self):
@@ -75,7 +75,7 @@ class Event(models.Model):
 class Article(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
         
     def __str__(self):
@@ -97,7 +97,7 @@ class EventImage(models.Model):
     
 class ArticleComment(models.Model):
     content = models.TextField()
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
         
@@ -106,7 +106,7 @@ class ArticleComment(models.Model):
 
 class EventComment(models.Model):
     content = models.TextField()
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
         
