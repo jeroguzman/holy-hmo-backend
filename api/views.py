@@ -153,7 +153,7 @@ class EventDetailView(APIView):
                 'author': comment.author.first_name + " " + comment.author.last_name,
                 'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
             } for comment in EventComment.objects.filter(event=event)],
-            'attending': EventAttendee.objects.filter(event=event, user=User.objects.get(email=email)).exists
+            'attending': EventAttendee.objects.filter(event=event, attendee=User.objects.get(email=email)).exists
 
         }
         return Response(event_details, status=status.HTTP_200_OK)
@@ -189,5 +189,5 @@ class AttendEventView(APIView):
         data = request.data
         event = Event.objects.get(id=data.get('event'))
         user = User.objects.get(email=data.get('email'))
-        EventAttendee.objects.create(event=event, user=user)
+        EventAttendee.objects.create(event=event, attendee=user)
         return Response(status=status.HTTP_200_OK)
