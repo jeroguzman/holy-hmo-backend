@@ -10,4 +10,5 @@ urlpatterns = [
    path('events/', views.EventView.as_view(), name='events'),
    path('event/', views.EventDetailView.as_view(), name='event'),
    path('event/attend/', views.EventAttendView.as_view(), name='event-attend'),
+   path('event/comment/', views.EventCommentView.as_view(), name='event-comment')
 ]

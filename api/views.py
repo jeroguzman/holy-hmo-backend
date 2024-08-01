@@ -158,3 +158,29 @@ class EventAttendView(APIView):
         user = User.objects.get(email=data.get('email'))
         EventAttendee.objects.create(event=event, user=user)
         return Response(status=status.HTTP_200_OK)
+    
+
+class EventCommentView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        event = Event.objects.get(id=data.get('event'))
+        user = User.objects.get(email=data.get('email'))
+        EventComment.objects.create(event=event, user=user, content=data.get('content'))
+        return Response(status=status.HTTP_200_OK)
+    
+    def get(self, request):
+        event = Event.objects.get(id=request.GET.get('event'))
+        comments = EventComment.objects.filter(event=event)
+        comments_list = []
+        for comment in comments:
+            comments_list.append({
+                'id': comment.id,
+                'content': comment.content,
+                'datetime': comment.datetime,
+                'author': comment.author.username,
+                'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
+            })
+        return Response(comments_list, status=status.HTTP_200_OK)
