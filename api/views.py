@@ -40,7 +40,7 @@ class UserView(APIView):
 
     def get(self, request, format=None):
         user = User.objects.get(email=request.GET.get('email'))
-        events = Event.objects.filter(attendees=user)
+        events = Event.objects.filter(eventattendee__attendee=user)
         list = []
         for event in events:
             list.append({
