@@ -66,7 +66,7 @@ class User(AbstractUser):
 class Event(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    datetime = models.DateTimeField(auto_now_add=True)
+    datetime = models.DateTimeField()
     location = models.CharField(max_length=100)
         
     def __str__(self):
