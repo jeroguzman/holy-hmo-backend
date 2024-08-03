@@ -197,6 +197,7 @@ class EventCommentView(APIView):
                 'content': comment.content,
                 'datetime': comment.datetime,
                 'author': comment.author.email,
+                'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
             })
         
         paginator = LimitOffsetPagination()
