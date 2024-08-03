@@ -160,14 +160,6 @@ class EventDetailView(APIView):
             'images': [request.build_absolute_uri(image.image.url) for image in EventImage.objects.filter(event=event)],
             'attendance': EventAttendee.objects.filter(event=event).count(),
             'attending': EventAttendee.objects.filter(event=event, attendee=User.objects.get(email=email)).exists(),
-            'comments': [{
-                'content': comment.content,
-                'datetime': comment.datetime,
-                'author': comment.author.first_name + " " + comment.author.last_name,
-                'photo': request.build_absolute_uri(comment.author.photo.url) if comment.author.photo else None,
-            } for comment in EventComment.objects.filter(event=event)],
-            
-
         }
         return Response(event_details, status=status.HTTP_200_OK)
 
