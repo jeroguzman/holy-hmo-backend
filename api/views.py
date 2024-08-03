@@ -7,6 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from .models import User, Role, Church, Event, Article, ArticleImage, EventImage, ArticleComment, EventComment, EventAttendee
 
 
@@ -185,6 +186,23 @@ class EventCommentView(APIView):
         author = User.objects.filter(email=data.get('email')).first()
         EventComment.objects.create(event=event, author=author, content=data.get('content'))
         return Response(status=status.HTTP_200_OK)
+    
+    def get(self, request):
+        event = Event.objects.get(id=request.GET.get('event'))
+        comments = EventComment.objects.filter(event=event)
+        comments_list = []
+        for comment in comments:
+            comments_list.append({
+                'id': comment.id,
+                'content': comment.content,
+                'datetime': comment.datetime,
+                'author': comment.author.email,
+            })
+        
+        paginator = LimitOffsetPagination()
+        result_comments = paginator.paginate_queryset(comments_list, request)
+
+        return paginator.get_paginated_response(result_comments)
 
 class AttendEventView(APIView):
 
